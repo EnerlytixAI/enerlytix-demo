@@ -248,19 +248,19 @@ Report EVERY issue you find. Do NOT self-limit.
 
 Return ONLY a valid JSON object — no markdown fences, no text outside the JSON:
 {{
-  "summary":  "Thorough 5-8 sentence assessment. Name specific issues found and their production risk.",
+  "summary":  "3-4 sentence assessment — name the critical issues and overall quality.",
   "verdict":  "APPROVED" | "CHANGES_REQUESTED" | "COMMENT",
-  "score":    <integer 1-10, be honest — code with memory leaks and SQL injection is a 2-3>,
+  "score":    <integer 1-10>,
   "stats":    {{ "critical": <n>, "warnings": <n>, "suggestions": <n> }},
   "comments": [
     {{
-      "file":           "<exact filename from the FILE header above>",
-      "line":           <integer — must match a line number from the numbered file content>,
-      "inline":         <true ONLY if that line number appears in DIFF LINES list, false otherwise>,
+      "file":           "<exact filename>",
+      "line":           <integer — from numbered file listing>,
+      "inline":         <true if line is in DIFF LINES, false otherwise>,
       "severity":       "critical" | "warning" | "suggestion",
-      "title":          "<concise title, max 60 chars>",
-      "body":           "<clear explanation: what is wrong, what the production risk is, how to fix it>",
-      "suggested_code": "<the corrected replacement line(s) — no fences, no explanations>"
+      "title":          "<issue title max 55 chars>",
+      "body":           "<2 sentences max: what is wrong and the Endur production risk>",
+      "suggested_code": "<single corrected line — no fences>"
     }}
   ]
 }}
@@ -281,10 +281,14 @@ def call_claude(prompt: str) -> dict:
     print(f"   Prompt size: {len(prompt)} chars")
     msg = client.messages.create(
         model      = "claude-sonnet-4-6",
-        max_tokens = 6000,
+        max_tokens = 8192,
         system     = SYSTEM_PROMPT,
         messages   = [{"role": "user", "content": prompt}],
     )
+
+    print(f"   Stop reason: {msg.stop_reason}")
+    if msg.stop_reason == "max_tokens":
+        print("   ⚠️  WARNING: Response was truncated — JSON will be incomplete!")
 
     raw = msg.content[0].text.strip()
     raw = re.sub(r'^```(?:json)?\s*', '', raw)
