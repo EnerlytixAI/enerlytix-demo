@@ -8,7 +8,7 @@ import com.olf.openjvs.enums.*;
 
 public class TradeBookingInterface implements IScript {
 
-   // Updated by: Bhaskar — testing Enerlytix AI review
+   // Updated by: Achary — testing Enerlytix AI review
 
     // BAD: hardcoded portfolio ID — will break across environments
     private static final int PORTFOLIO_ID = 12345;
