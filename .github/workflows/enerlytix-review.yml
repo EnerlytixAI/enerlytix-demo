@@ -10,6 +10,7 @@ on:
       - '**.sql'
       - '**.js'
       - '**.ts'
+      - '**.sh'
 
 permissions:
   contents: read
@@ -17,7 +18,7 @@ permissions:
 
 jobs:
   enerlytix-inline-review:
-    name: Endur SME Inline Review
+    name: Enerlytix AI Inline Review
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -42,6 +43,7 @@ jobs:
           PR_NUMBER:         ${{ github.event.pull_request.number }}
           REPO_NAME:         ${{ github.repository }}
           BASE_REF:          ${{ github.base_ref }}
+          HEAD_REF:          ${{ github.head_ref }}
           HEAD_SHA:          ${{ github.event.pull_request.head.sha }}
           TDD_PATH:          ${{ vars.TDD_DOCUMENT_PATH }}
           STANDARDS_PATH:    ${{ vars.CODING_STANDARDS_PATH }}
