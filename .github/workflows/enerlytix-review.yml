@@ -1,0 +1,48 @@
+name: Enerlytix AI Inline Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.jvs'
+      - '**.java'
+      - '**.py'
+      - '**.sql'
+      - '**.js'
+      - '**.ts'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  enerlytix-inline-review:
+    name: Endur SME Inline Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run Enerlytix Inline Review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER:         ${{ github.event.pull_request.number }}
+          REPO_NAME:         ${{ github.repository }}
+          BASE_REF:          ${{ github.base_ref }}
+          HEAD_SHA:          ${{ github.event.pull_request.head.sha }}
+          TDD_PATH:          ${{ vars.TDD_DOCUMENT_PATH }}
+          STANDARDS_PATH:    ${{ vars.CODING_STANDARDS_PATH }}
+        run: python .github/scripts/enerlytix_inline_review.py
